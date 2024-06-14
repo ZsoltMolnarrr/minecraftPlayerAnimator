@@ -4,6 +4,7 @@ import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
 import dev.kosmx.playerAnim.core.data.gson.AnimationSerializing;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -98,7 +99,7 @@ public final class PlayerAnimationRegistry {
                 for (var animation : AnimationSerializing.deserializeAnimation(input)) {
 
                     //Save the animation for later use.
-                    animations.put(new ResourceLocation(resource.getKey().getNamespace(), PlayerAnimationRegistry.serializeTextToString((String) animation.extraData.get("name")).toLowerCase(Locale.ROOT)), animation);
+                    animations.put(ResourceLocation.fromNamespaceAndPath(resource.getKey().getNamespace(), PlayerAnimationRegistry.serializeTextToString((String) animation.extraData.get("name")).toLowerCase(Locale.ROOT)), animation);
                 }
             } catch(IOException e) {
                 logger.error("Error while loading payer animation: " + resource.getKey());
@@ -118,7 +119,7 @@ public final class PlayerAnimationRegistry {
      */
     public static String serializeTextToString(String arg) {
         try {
-            var component = Component.Serializer.fromJson(arg);
+            var component = Component.Serializer.fromJson(arg, RegistryAccess.EMPTY);
             if (component != null) {
                 return component.getString();
             }

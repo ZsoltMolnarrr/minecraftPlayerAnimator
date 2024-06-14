@@ -33,7 +33,7 @@ public class FabricClientInitializer implements ClientModInitializer {
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
             @Override
             public ResourceLocation getFabricId() {
-                return new ResourceLocation("playeranimator", "animation");
+                return ResourceLocation.fromNamespaceAndPath("playeranimator", "animation");
             }
 
             @Override

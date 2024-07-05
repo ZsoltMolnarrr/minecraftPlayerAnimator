@@ -4,7 +4,10 @@ import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
 import dev.kosmx.playerAnim.core.data.gson.AnimationSerializing;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.ApiStatus;
@@ -19,6 +22,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Load resources from <code>assets/{modid}/player_animation</code>
@@ -118,7 +122,17 @@ public final class PlayerAnimationRegistry {
      */
     public static String serializeTextToString(String arg) {
         try {
-            var component = Component.Serializer.fromJson(arg);
+            var component = Component.Serializer.fromJson(arg, new HolderLookup.Provider() {
+                @Override
+                public @NotNull Stream<ResourceKey<? extends Registry<?>>> listRegistries() {
+                    return Stream.empty();
+                }
+
+                @Override
+                public <T> @NotNull Optional<HolderLookup.RegistryLookup<T>> lookup(@NotNull ResourceKey<? extends Registry<? extends T>> resourceKey) {
+                    return Optional.empty();
+                }
+            });
             if (component != null) {
                 return component.getString();
             }

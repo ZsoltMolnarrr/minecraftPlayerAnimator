@@ -102,7 +102,7 @@ public final class PlayerAnimationRegistry {
                 for (var animation : AnimationSerializing.deserializeAnimation(input)) {
 
                     //Save the animation for later use.
-                    animations.put(new ResourceLocation(resource.getKey().getNamespace(), PlayerAnimationRegistry.serializeTextToString((String) animation.extraData.get("name")).toLowerCase(Locale.ROOT)), animation);
+                    animations.put(ResourceLocation.fromNamespaceAndPath(resource.getKey().getNamespace(), PlayerAnimationRegistry.serializeTextToString((String) animation.extraData.get("name")).toLowerCase(Locale.ROOT)), animation);
                 }
             } catch(IOException e) {
                 logger.error("Error while loading payer animation: " + resource.getKey());

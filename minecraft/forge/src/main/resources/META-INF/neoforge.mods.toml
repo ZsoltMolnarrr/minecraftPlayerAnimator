@@ -6,6 +6,7 @@ license = "MIT"
 [[mods]]
 modId = "playeranimator"
 version = "${version}"
+displayURL = "https://github.com/KosmX/minecraftPlayerAnimator"
 displayName = "Player Animator"
 authors = "KosmX"
 description = "A lightweight library to easily animate the player"

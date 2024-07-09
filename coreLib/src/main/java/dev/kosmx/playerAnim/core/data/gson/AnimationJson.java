@@ -177,7 +177,12 @@ public class AnimationJson implements JsonDeserializer<List<KeyframeAnimation>>,
         }
         emote.extraData.forEach((s, o) -> {
             if (o instanceof String) {
-                node.add(s, asJson((String)o));
+                String s1 = (String) o;
+                try {
+                    node.add(s, asJson(s1));
+                } catch (Throwable th) {
+                    node.addProperty(s, s1);
+                }
             } else if (o instanceof Number) {
                 node.addProperty(s, (Number) o);
             } else if (o instanceof Boolean) {

@@ -5,11 +5,11 @@
   "name": "Player Animator",
   "description": "A lightweight library to easily animate the player",
   "authors": [
-    "KosmX "
+    "KosmX  "
   ],
   "contact": {
     "homepage": "kosmx.dev",
-    "sources": "https://github.com/KosmX/minecraftPlayerAnimator"
+    "sources": "https://github.com/KosmX/fabricPlayerAnimation"
   },
   "provides": [
     "player-animator"

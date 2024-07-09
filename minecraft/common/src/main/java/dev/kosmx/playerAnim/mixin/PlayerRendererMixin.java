@@ -71,7 +71,7 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
 
 
     @Inject(method = "setupRotations(Lnet/minecraft/client/player/AbstractClientPlayer;Lcom/mojang/blaze3d/vertex/PoseStack;FFFF)V", at = @At("RETURN"))
-    private void applyBodyTransforms(AbstractClientPlayer abstractClientPlayerEntity, PoseStack matrixStack, float f, float bodyYaw, float tickDelta, float i, CallbackInfo ci){
+    private void applyBodyTransforms(AbstractClientPlayer abstractClientPlayerEntity, PoseStack matrixStack, float f, float bodyYaw, float tickDelta, float scale, CallbackInfo ci){
         var animationPlayer = ((IAnimatedPlayer) abstractClientPlayerEntity).playerAnimator_getAnimation();
         animationPlayer.setTickDelta(tickDelta);
         if(animationPlayer.isActive()){

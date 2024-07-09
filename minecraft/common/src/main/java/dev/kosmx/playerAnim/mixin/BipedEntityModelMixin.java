@@ -60,7 +60,7 @@ public abstract class BipedEntityModelMixin<T extends LivingEntity> extends Agea
 
     @Intrinsic(displace = true)
     @Override
-    public void renderToBuffer(PoseStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
+    public void renderToBuffer(PoseStack matrices, VertexConsumer vertices, int light, int overlay, int color){
         if(Helper.isBendEnabled() && this.animation.get() != null && this.animation.get().isActive()){
             this.headParts().forEach((part)->{
                 if(! ((IUpperPartHelper) part).isUpperPart()){

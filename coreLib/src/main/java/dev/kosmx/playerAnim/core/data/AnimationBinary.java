@@ -91,6 +91,11 @@ public final class AnimationBinary {
             writeKeyframes(buf, part.bendDirection, version);
             writeKeyframes(buf, part.bend, version);
         }
+        if (part.isScalable && version >= 3) {
+            writeKeyframes(buf, part.scaleX, version);
+            writeKeyframes(buf, part.scaleY, version);
+            writeKeyframes(buf, part.scaleZ, version);
+        }
     }
 
     private static void writeKeyframes(ByteBuffer buf, KeyframeAnimation.StateCollection.State part, int version){
@@ -167,6 +172,11 @@ public final class AnimationBinary {
             bl = readKeyframes(buf, part.bendDirection, version, keyframeSize) && bl;
             bl = readKeyframes(buf, part.bend, version, keyframeSize) && bl;
         }
+        if (part.isScalable() && version >= 3) {
+            bl = readKeyframes(buf, part.scaleX, version, keyframeSize) && bl;
+            bl = readKeyframes(buf, part.scaleY, version, keyframeSize) && bl;
+            bl = readKeyframes(buf, part.scaleZ, version, keyframeSize) && bl;
+        }
         return bl;
     }
 
@@ -200,7 +210,7 @@ public final class AnimationBinary {
      * @return version
      */
     public static int getCurrentVersion() {
-        return 2;
+        return 3;
     }
 
 
@@ -243,6 +253,11 @@ public final class AnimationBinary {
         if(part.isBendable) {
             size += axisSize(part.bend, version);
             size += axisSize(part.bendDirection, version);
+        }
+        if (part.isScalable && version >= 3) {
+            size += axisSize(part.scaleX, version);
+            size += axisSize(part.scaleY, version);
+            size += axisSize(part.scaleZ, version);
         }
         return size;
     }

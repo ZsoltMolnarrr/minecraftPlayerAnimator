@@ -112,7 +112,7 @@ public class AnimationJson implements JsonDeserializer<List<KeyframeAnimation>>,
         if(node.has("easeBeforeKeyframe"))builder.isEasingBefore = node.get("easeBeforeKeyframe").getAsBoolean();
         moveDeserializer(builder, node.getAsJsonArray("moves"), degrees, version);
 
-        builder.fullyEnableParts();
+        // builder.fullyEnableParts();
 
         return builder;
     }
@@ -145,6 +145,9 @@ public class AnimationJson implements JsonDeserializer<List<KeyframeAnimation>>,
         addPartIfExists(part.roll, "roll", partNode, degrees, tick, easing, turn);
         addPartIfExists(part.bend, "bend", partNode, degrees, tick, easing, turn);
         addPartIfExists(part.bendDirection, "axis", partNode, degrees, tick, easing, turn);
+        addPartIfExists(part.scaleX, "scaleX", partNode, degrees, tick, easing, turn);
+        addPartIfExists(part.scaleY, "scaleY", partNode, degrees, tick, easing, turn);
+        addPartIfExists(part.scaleZ, "scaleZ", partNode, degrees, tick, easing, turn);
     }
 
     private void addPartIfExists(KeyframeAnimation.StateCollection.State part, String name, JsonObject node, boolean degrees, int tick, String easing, int turn){
@@ -243,6 +246,11 @@ public class AnimationJson implements JsonDeserializer<List<KeyframeAnimation>>,
         if(bodyPart.isBendable) {
             partSerialize(node, bodyPart.bend, partName);
             partSerialize(node, bodyPart.bendDirection, partName);
+        }
+        if(bodyPart.isScalable) {
+            partSerialize(node, bodyPart.scaleX, partName);
+            partSerialize(node, bodyPart.scaleY, partName);
+            partSerialize(node, bodyPart.scaleZ, partName);
         }
     }
 

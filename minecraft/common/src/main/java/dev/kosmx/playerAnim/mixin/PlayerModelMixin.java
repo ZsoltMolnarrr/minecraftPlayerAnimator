@@ -93,6 +93,25 @@ public class PlayerModelMixin<T extends LivingEntity> extends HumanoidModel<T> i
         this.body.z = 0f;
         this.body.yRot = 0;
         this.body.zRot = 0;
+
+        this.head.xScale = ModelPart.DEFAULT_SCALE;
+        this.head.yScale = ModelPart.DEFAULT_SCALE;
+        this.head.zScale = ModelPart.DEFAULT_SCALE;
+        this.body.xScale = ModelPart.DEFAULT_SCALE;
+        this.body.yScale = ModelPart.DEFAULT_SCALE;
+        this.body.zScale = ModelPart.DEFAULT_SCALE;
+        this.rightArm.xScale = ModelPart.DEFAULT_SCALE;
+        this.rightArm.yScale = ModelPart.DEFAULT_SCALE;
+        this.rightArm.zScale = ModelPart.DEFAULT_SCALE;
+        this.leftArm.xScale = ModelPart.DEFAULT_SCALE;
+        this.leftArm.yScale = ModelPart.DEFAULT_SCALE;
+        this.leftArm.zScale = ModelPart.DEFAULT_SCALE;
+        this.rightLeg.xScale = ModelPart.DEFAULT_SCALE;
+        this.rightLeg.yScale = ModelPart.DEFAULT_SCALE;
+        this.rightLeg.zScale = ModelPart.DEFAULT_SCALE;
+        this.leftLeg.xScale = ModelPart.DEFAULT_SCALE;
+        this.leftLeg.yScale = ModelPart.DEFAULT_SCALE;
+        this.leftLeg.zScale = ModelPart.DEFAULT_SCALE;
     }
 
     @Inject(method = "setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", at = @At(value = "HEAD"))

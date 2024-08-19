@@ -54,7 +54,11 @@ public class QuarkReader {
 
              */
             return emote
-                    .setName("{\"color\":\"white\",\"text\":\"" + this.name + "\"}")
+                    .setName("{\n" +
+                            "   \"color\":\"white\",\n" +
+                            "   \"translate\":\"quark.emote." + this.name.replace(".emote", "") + "\",\n" + // https://github.com/VazkiiMods/Quark/blob/master/src/main/resources/assets/quark/lang/en_us.json#L397-L414
+                            "   \"fallback\":\"" + this.name + "\"\n" +
+                            "}")
                     .setDescription("{\"color\":\"gray\",\"text\":\"Imported from quark\"}")
                     .build();
         }else return null;

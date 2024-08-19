@@ -77,6 +77,10 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
         if(animationPlayer.isActive()){
 
             //These are additive properties
+            Vec3f vec3e = animationPlayer.get3DTransform("body", TransformType.SCALE,
+                    new Vec3f(ModelPart.DEFAULT_SCALE, ModelPart.DEFAULT_SCALE, ModelPart.DEFAULT_SCALE)
+            );
+            matrixStack.scale(vec3e.getX(), vec3e.getY(), vec3e.getZ());
             Vec3f vec3d = animationPlayer.get3DTransform("body", TransformType.POSITION, Vec3f.ZERO);
             matrixStack.translate(vec3d.getX(), vec3d.getY() + 0.7, vec3d.getZ());
             Vec3f vec3f = animationPlayer.get3DTransform("body", TransformType.ROTATION, Vec3f.ZERO);

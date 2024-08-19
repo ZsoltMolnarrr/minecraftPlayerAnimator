@@ -144,6 +144,8 @@ public class KeyframeAnimationPlayer implements IAnimation {
             case BEND:
                 Pair<Float, Float> bend = part.getBend(new Pair<>(value0.getX(), value0.getY()));
                 return new Vec3f(bend.getLeft(), bend.getRight(), 0f);
+            case SCALE:
+                return part.getScale(value0);
             default:
                 return value0;
         }
@@ -198,6 +200,9 @@ public class KeyframeAnimationPlayer implements IAnimation {
         public final RotationAxis roll;
         public final RotationAxis bendAxis;
         public final RotationAxis bend;
+        public final Axis scaleX;
+        public final Axis scaleY;
+        public final Axis scaleZ;
 
 
         public BodyPart(@Nullable KeyframeAnimation.StateCollection part) {
@@ -211,6 +216,9 @@ public class KeyframeAnimationPlayer implements IAnimation {
                 this.roll = new RotationAxis(part.roll);
                 this.bendAxis = new RotationAxis(part.bendDirection);
                 this.bend = new RotationAxis(part.bend);
+                this.scaleX = new Axis(part.scaleX);
+                this.scaleY = new Axis(part.scaleY);
+                this.scaleZ = new Axis(part.scaleZ);
             }
             else {
                 this.x = null;
@@ -221,6 +229,9 @@ public class KeyframeAnimationPlayer implements IAnimation {
                 this.roll = null;
                 this.bendAxis = null;
                 this.bend = null;
+                this.scaleX = null;
+                this.scaleY = null;
+                this.scaleZ = null;
             }
         }
 
@@ -228,6 +239,15 @@ public class KeyframeAnimationPlayer implements IAnimation {
         public Pair<Float, Float> getBend(Pair<Float, Float> value0) {
             if(bend == null) return value0;
             return new Pair<>(this.bendAxis.getValueAtCurrentTick(value0.getLeft()), this.bend.getValueAtCurrentTick(value0.getRight()));
+        }
+
+        public Vec3f getScale(Vec3f value0) {
+            if (this.part == null) return value0;
+            return new Vec3f(
+                    this.scaleX.getValueAtCurrentTick(value0.getX()),
+                    this.scaleY.getValueAtCurrentTick(value0.getY()),
+                    this.scaleZ.getValueAtCurrentTick(value0.getZ())
+            );
         }
 
         public Vec3f getBodyOffset(Vec3f value0) {

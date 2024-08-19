@@ -20,6 +20,9 @@ import java.util.function.Function;
  *     float rotationX = 0;
  *     float rotationY = 0;
  *     float rotationZ = 0;
+ *     float scaleX = 0;
+ *     float scaleY = 0;
+ *     float scaleZ = 0;
  *     float offsetX = 0;
  *     float offsetY = 0;
  *     float offsetZ = 0;
@@ -40,6 +43,7 @@ import java.util.function.Function;
  *
  *     return Optional.of(new AdjustmentModifier.PartModifier(
  *             new Vec3f(rotationX, rotationY, rotationZ),
+ *             new Vec3f(scaleX, scaleY, scaleZ),
  *             new Vec3f(offsetX, offsetY, offsetZ))
  *     );
  * });
@@ -49,18 +53,32 @@ import java.util.function.Function;
 public class AdjustmentModifier extends AbstractModifier {
     public static final class PartModifier {
         private final Vec3f rotation;
+        private final Vec3f scale;
         private final Vec3f offset;
 
         public PartModifier(
                 Vec3f rotation,
                 Vec3f offset
         ) {
+            this(rotation, Vec3f.ZERO, offset);
+        }
+
+        public PartModifier(
+                Vec3f rotation,
+                Vec3f scale,
+                Vec3f offset
+        ) {
             this.rotation = rotation;
+            this.scale = scale;
             this.offset = offset;
         }
 
         public Vec3f rotation() {
             return rotation;
+        }
+
+        public Vec3f scale() {
+            return scale;
         }
 
         public Vec3f offset() {
@@ -73,18 +91,20 @@ public class AdjustmentModifier extends AbstractModifier {
             if (obj == null || obj.getClass() != this.getClass()) return false;
             PartModifier that = (PartModifier) obj;
             return Objects.equals(this.rotation, that.rotation) &&
+                    Objects.equals(this.scale, that.scale) &&
                     Objects.equals(this.offset, that.offset);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(rotation, offset);
+            return Objects.hash(rotation, scale, offset);
         }
 
         @Override
         public String toString() {
             return "PartModifier[" +
                     "rotation=" + rotation + ", " +
+                    "scale=" + scale + ", " +
                     "offset=" + offset + ']';
         }
     }
@@ -176,6 +196,8 @@ public class AdjustmentModifier extends AbstractModifier {
                 return vector.add(partModifier.offset().scale(fade));
             case ROTATION:
                 return vector.add(partModifier.rotation().scale(fade));
+            case SCALE:
+                return vector.add(partModifier.scale().scale(fade));
             case BEND:
                 break;
         }

@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import dev.kosmx.playerAnim.api.TransformType;
 import dev.kosmx.playerAnim.core.data.AnimationFormat;
 import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
 import dev.kosmx.playerAnim.core.util.Ease;
@@ -76,20 +77,20 @@ public class GeckoLibSerializer {
         if(node.has("rotation")){
             JsonElement jsonRotation = node.get("rotation");
             if(jsonRotation.isJsonArray()){
-                readCollection(getRots(stateCollection), 0, Ease.LINEAR, jsonRotation.getAsJsonArray(), emoteData, false);
+                readCollection(getTargetVec(stateCollection, TransformType.ROTATION), 0, Ease.LINEAR, jsonRotation.getAsJsonArray(), emoteData, TransformType.ROTATION);
             }
             else {
                 jsonRotation.getAsJsonObject().entrySet().forEach(entry -> {
                     if(entry.getKey().equals("vector")){
-                        readCollection(getRots(stateCollection), 0, Ease.LINEAR, entry.getValue().getAsJsonArray(), emoteData, false);
+                        readCollection(getTargetVec(stateCollection, TransformType.ROTATION), 0, Ease.LINEAR, entry.getValue().getAsJsonArray(), emoteData, TransformType.ROTATION);
                     }
                     else if (!entry.getKey().equals("easing")) {
                         int tick = (int) (Float.parseFloat(entry.getKey()) * 20);
                         if (entry.getValue().isJsonArray()) {
-                            readCollection(getRots(stateCollection), tick, Ease.CONSTANT, entry.getValue().getAsJsonArray(), emoteData, false);
+                            readCollection(getTargetVec(stateCollection, TransformType.ROTATION), tick, Ease.CONSTANT, entry.getValue().getAsJsonArray(), emoteData, TransformType.ROTATION);
                         }
                         else {
-                            readDataAtTick(entry.getValue().getAsJsonObject(), stateCollection, tick, emoteData, false);
+                            readDataAtTick(entry.getValue().getAsJsonObject(), stateCollection, tick, emoteData, TransformType.ROTATION);
                         }
                     }
                 });
@@ -98,19 +99,40 @@ public class GeckoLibSerializer {
         if(node.has("position")){
             JsonElement jsonPosition = node.get("position");
             if(jsonPosition.isJsonArray()){
-                readCollection(getOffs(stateCollection), 0, Ease.LINEAR, jsonPosition.getAsJsonArray(), emoteData, true);
+                readCollection(getTargetVec(stateCollection, TransformType.POSITION), 0, Ease.LINEAR, jsonPosition.getAsJsonArray(), emoteData, TransformType.POSITION);
             }
             else {
                 jsonPosition.getAsJsonObject().entrySet().forEach(entry -> {
                     if(entry.getKey().equals("vector")){
-                        readCollection(getOffs(stateCollection), 0, Ease.LINEAR, entry.getValue().getAsJsonArray(), emoteData, true);
+                        readCollection(getTargetVec(stateCollection, TransformType.POSITION), 0, Ease.LINEAR, entry.getValue().getAsJsonArray(), emoteData, TransformType.POSITION);
                     }else if (!entry.getKey().equals("easing")) {
                         int tick = (int) (Float.parseFloat(entry.getKey()) * 20);
                         if (entry.getValue().isJsonArray()) {
-                            readCollection(getOffs(stateCollection), tick, Ease.LINEAR, entry.getValue().getAsJsonArray(), emoteData, true);
+                            readCollection(getTargetVec(stateCollection, TransformType.POSITION), tick, Ease.LINEAR, entry.getValue().getAsJsonArray(), emoteData, TransformType.POSITION);
                         }
                         else {
-                            readDataAtTick(entry.getValue().getAsJsonObject(), stateCollection, tick, emoteData, true);
+                            readDataAtTick(entry.getValue().getAsJsonObject(), stateCollection, tick, emoteData, TransformType.POSITION);
+                        }
+                    }
+                });
+            }
+        }
+        if(node.has("scale")){
+            JsonElement jsonPosition = node.get("scale");
+            if(jsonPosition.isJsonArray()){
+                readCollection(getTargetVec(stateCollection, TransformType.SCALE), 0, Ease.LINEAR, jsonPosition.getAsJsonArray(), emoteData, TransformType.SCALE);
+            }
+            else {
+                jsonPosition.getAsJsonObject().entrySet().forEach(entry -> {
+                    if(entry.getKey().equals("vector")){
+                        readCollection(getTargetVec(stateCollection, TransformType.SCALE), 0, Ease.LINEAR, entry.getValue().getAsJsonArray(), emoteData, TransformType.SCALE);
+                    }else if (!entry.getKey().equals("easing")) {
+                        int tick = (int) (Float.parseFloat(entry.getKey()) * 20);
+                        if (entry.getValue().isJsonArray()) {
+                            readCollection(getTargetVec(stateCollection, TransformType.SCALE), tick, Ease.LINEAR, entry.getValue().getAsJsonArray(), emoteData, TransformType.SCALE);
+                        }
+                        else {
+                            readDataAtTick(entry.getValue().getAsJsonObject(), stateCollection, tick, emoteData, TransformType.SCALE);
                         }
                     }
                 });
@@ -118,20 +140,20 @@ public class GeckoLibSerializer {
         }
     }
 
-    private static void readDataAtTick(JsonObject currentNode, KeyframeAnimation.StateCollection stateCollection, int tick, KeyframeAnimation.AnimationBuilder emoteData, boolean isPos) {
+    private static void readDataAtTick(JsonObject currentNode, KeyframeAnimation.StateCollection stateCollection, int tick, KeyframeAnimation.AnimationBuilder emoteData, TransformType type) {
         Ease ease = Ease.LINEAR;
         if (currentNode.has("lerp_mode")) {
             String lerp = currentNode.get("lerp_mode").getAsString();
             ease = lerp.equals("catmullrom") ? Ease.INOUTSINE : Easing.easeFromString(lerp); //IDK what am I doing
         }
-        KeyframeAnimation.StateCollection.State[] targetVec = isPos ? getOffs(stateCollection) : getRots(stateCollection);
+        KeyframeAnimation.StateCollection.State[] targetVec = getTargetVec(stateCollection, type);
         if (currentNode.has("easing")) ease = Easing.easeFromString(currentNode.get("easing").getAsString());
         if (currentNode.has("pre"))
-            readCollection(targetVec, tick, ease, getVector(currentNode.get("pre")), emoteData, isPos);
+            readCollection(targetVec, tick, ease, getVector(currentNode.get("pre")), emoteData, type);
         if (currentNode.has("vector"))
-            readCollection(targetVec, tick, ease, currentNode.get("vector").getAsJsonArray(), emoteData, isPos);
+            readCollection(targetVec, tick, ease, currentNode.get("vector").getAsJsonArray(), emoteData, type);
         if (currentNode.has("post"))
-            readCollection(targetVec, tick, ease, getVector(currentNode.get("post")), emoteData, isPos);
+            readCollection(targetVec, tick, ease, getVector(currentNode.get("post")), emoteData, type);
     }
 
     public static JsonArray getVector(JsonElement element) {
@@ -139,11 +161,11 @@ public class GeckoLibSerializer {
         else return ((JsonObject)element).get("vector").getAsJsonArray();
     }
 
-    private static void readCollection(KeyframeAnimation.StateCollection.State[] a, int tick, Ease ease, JsonArray array, KeyframeAnimation.AnimationBuilder emoteData, boolean isPos){
+    private static void readCollection(KeyframeAnimation.StateCollection.State[] a, int tick, Ease ease, JsonArray array, KeyframeAnimation.AnimationBuilder emoteData, TransformType type) {
         if(a.length != 3)throw new ArrayStoreException("wrong array length");
         for(int i = 0; i < 3; i++){
             float value = array.get(i).getAsFloat();
-            if (isPos) {
+            if (type == TransformType.POSITION) {
                 if (a[0] == emoteData.body.x) {
                     value = value / 16f;
                     if (i == 0) value = -value;
@@ -151,12 +173,14 @@ public class GeckoLibSerializer {
                 else if (i == 1) {
                     value = -value;
                 }
-            } else {
+            } else if (type == TransformType.ROTATION) {
                 if (a[0] == emoteData.body.pitch && i != 2) {
                     value = -value;
                 }
             }
-            value += a[i].defaultValue;
+            if (type != TransformType.SCALE) {
+                value += a[i].defaultValue;
+            }
             a[i].addKeyFrame(tick, value, ease, 0, true);
         }
     }
@@ -190,12 +214,30 @@ public class GeckoLibSerializer {
         return builder.toString();
     }
 
-    private static KeyframeAnimation.StateCollection.State[] getRots(KeyframeAnimation.StateCollection stateCollection){
-        return new KeyframeAnimation.StateCollection.State[] {stateCollection.pitch, stateCollection.yaw, stateCollection.roll};
-    }
+    public static KeyframeAnimation.StateCollection.State[] getTargetVec(KeyframeAnimation.StateCollection stateCollection, TransformType type){
+        switch (type) {
+            case POSITION:
+                return new KeyframeAnimation.StateCollection.State[] {
+                        stateCollection.x, stateCollection.y, stateCollection.z
+                };
 
-    private static KeyframeAnimation.StateCollection.State[] getOffs(KeyframeAnimation.StateCollection stateCollection){
-        return new KeyframeAnimation.StateCollection.State[] {stateCollection.x, stateCollection.y, stateCollection.z};
-    }
+            case ROTATION:
+                return new KeyframeAnimation.StateCollection.State[] {
+                        stateCollection.pitch, stateCollection.yaw, stateCollection.roll
+                };
 
+            case SCALE:
+                return new KeyframeAnimation.StateCollection.State[] {
+                        stateCollection.scaleX, stateCollection.scaleY, stateCollection.scaleZ
+                };
+
+            case BEND:
+                return new KeyframeAnimation.StateCollection.State[] {
+                        stateCollection.bend, stateCollection.bendDirection
+                };
+
+            default:
+                return new KeyframeAnimation.StateCollection.State[0];
+        }
+    }
 }

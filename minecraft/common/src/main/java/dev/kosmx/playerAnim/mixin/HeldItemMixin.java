@@ -8,6 +8,7 @@ import dev.kosmx.playerAnim.core.util.Pair;
 import dev.kosmx.playerAnim.core.util.Vec3f;
 import dev.kosmx.playerAnim.impl.Helper;
 import dev.kosmx.playerAnim.impl.IAnimatedPlayer;
+import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.entity.layers.ItemInHandLayer;
@@ -51,9 +52,13 @@ public class HeldItemMixin {
             if (player.playerAnimator_getAnimation().isActive()) {
                 AnimationProcessor anim = player.playerAnimator_getAnimation();
 
+                Vec3f scale = anim.get3DTransform(arm == HumanoidArm.LEFT ? "leftItem" : "rightItem", TransformType.SCALE,
+                        new Vec3f(ModelPart.DEFAULT_SCALE, ModelPart.DEFAULT_SCALE, ModelPart.DEFAULT_SCALE)
+                );
                 Vec3f rot = anim.get3DTransform(arm == HumanoidArm.LEFT ? "leftItem" : "rightItem", TransformType.ROTATION, Vec3f.ZERO);
                 Vec3f pos = anim.get3DTransform(arm == HumanoidArm.LEFT ? "leftItem" : "rightItem", TransformType.POSITION, Vec3f.ZERO).scale(1/16f);
 
+                matrices.scale(scale.getX(), scale.getY(), scale.getZ());
                 matrices.translate(pos.getX(), pos.getY(), pos.getZ());
 
                 matrices.mulPose(Vector3f.ZP.rotation(rot.getZ()));    //roll

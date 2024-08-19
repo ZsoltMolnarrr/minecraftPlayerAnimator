@@ -26,6 +26,12 @@ public class AnimationApplier extends AnimationProcessor {
                 MathHelper.clampToRadian(part.yRot),
                 MathHelper.clampToRadian(part.zRot)));
         part.setRotation(rot.getX(), rot.getY(), rot.getZ());
+        Vec3f scale = this.get3DTransform(partName, TransformType.SCALE,
+                new Vec3f(part.xScale, part.yScale, part.zScale)
+        );
+        part.xScale = scale.getX();
+        part.yScale = scale.getY();
+        part.zScale = scale.getZ();
         if (!partName.equals("head")) {
             if (partName.equals("torso")) {
                 Pair<Float, Float> torsoBend = getBend(partName);

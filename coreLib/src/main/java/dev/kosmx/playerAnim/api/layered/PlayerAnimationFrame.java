@@ -49,7 +49,7 @@ public abstract class PlayerAnimationFrame implements IAnimation {
     public boolean isActive() {
         for (Map.Entry<String, PlayerPart> entry: parts.entrySet()) {
             PlayerPart part = entry.getValue();
-            if (part.bend != null || part.pos != null || part.rot != null) return true;
+            if (part.bend != null || part.pos != null || part.rot != null || part.scale != null) return true;
         }
         return false;
     }
@@ -74,6 +74,8 @@ public abstract class PlayerAnimationFrame implements IAnimation {
                 return part.pos == null ? value0 : part.pos;
             case ROTATION:
                 return part.rot == null ? value0 : part.rot;
+            case SCALE:
+                return part.scale == null ? value0 : part.scale;
             case BEND:
                 return part.bend == null ? value0 : new Vec3f(part.bend.getLeft(), part.bend.getRight(), 0f);
             default:
@@ -83,11 +85,12 @@ public abstract class PlayerAnimationFrame implements IAnimation {
 
     public static class PlayerPart {
         public Vec3f pos;
+        public Vec3f scale;
         public Vec3f rot;
         public Pair<Float, Float> bend;
 
         protected void setNull() {
-            pos = rot = null;
+            pos = scale = rot = null;
             bend = null;
         }
     }

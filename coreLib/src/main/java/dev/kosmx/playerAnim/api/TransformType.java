@@ -12,5 +12,9 @@ public enum TransformType {
     /**
      * Bend the part, the vector should look like this: {bend planes rotation 0-2&pi;, bend value, not defined}
      */
-    BEND
+    BEND,
+    /**
+     * The part is scaled in 3d space
+     */
+    SCALE
 }

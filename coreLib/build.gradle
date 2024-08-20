@@ -21,7 +21,7 @@ dependencies {
 }
 
 compileJava {
-    options.release.set 8
+    options.release.set 17
 }
 
 

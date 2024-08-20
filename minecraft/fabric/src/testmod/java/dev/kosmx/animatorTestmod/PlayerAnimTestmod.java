@@ -81,7 +81,7 @@ public class PlayerAnimTestmod implements ClientModInitializer {
             //Fade from current animation to a new one.
             //Will not fade if there is no animation currently.
             testAnimation.replaceAnimationWithFade(AbstractFadeModifier.functionalFadeIn(20, (modelName, type, value) -> value),
-                    new KeyframeAnimationPlayer(PlayerAnimationRegistry.getAnimation(ResourceLocation.fromNamespaceAndPath("testmod", "two_handed_slash_vertical_right")))
+                    PlayerAnimationRegistry.getAnimation(ResourceLocation.fromNamespaceAndPath("testmod", "two_handed_slash_vertical_right")).playAnimation()
                             .setFirstPersonMode(FirstPersonMode.THIRD_PERSON_MODEL)
                             .setFirstPersonConfiguration(new FirstPersonConfiguration().setShowRightArm(true).setShowLeftItem(false))
             );

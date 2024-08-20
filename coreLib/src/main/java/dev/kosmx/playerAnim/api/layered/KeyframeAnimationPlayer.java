@@ -30,7 +30,7 @@ import java.util.Map;
  *
  */
 @SuppressWarnings({"unused", "ConstantConditions"})
-public class KeyframeAnimationPlayer implements IAnimation {
+public class KeyframeAnimationPlayer implements IActualAnimation<KeyframeAnimationPlayer> {
 
 
 

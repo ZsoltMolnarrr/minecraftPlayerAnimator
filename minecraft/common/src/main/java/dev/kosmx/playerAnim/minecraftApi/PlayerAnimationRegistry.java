@@ -1,8 +1,8 @@
 package dev.kosmx.playerAnim.minecraftApi;
 
 import dev.kosmx.playerAnim.api.IPlayable;
-import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
-import dev.kosmx.playerAnim.core.data.gson.AnimationSerializing;
+import dev.kosmx.playerAnim.minecraftApi.codec.AnimationCodec;
+import dev.kosmx.playerAnim.minecraftApi.codec.AnimationCodecRegistry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.RegistryAccess;
@@ -13,12 +13,11 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -52,6 +51,7 @@ import java.util.Optional;
 public final class PlayerAnimationRegistry {
 
     private static final HashMap<ResourceLocation, IPlayable> animations = new HashMap<>();
+    private static final Logger logger = LoggerFactory.getLogger(PlayerAnimationRegistry.class);
 
     /**
      * Get an animation from the registry, using Identifier(MODID, animation_name) as key
@@ -102,23 +102,25 @@ public final class PlayerAnimationRegistry {
     @ApiStatus.Internal
     public static void resourceLoaderCallback(@NotNull ResourceManager manager, Logger logger) {
         animations.clear();
-        for (var resource: manager.listResources("player_animation", location -> location.getPath().endsWith(".json")).entrySet()) {
-            try (var input = resource.getValue().open()) {
 
-                //Deserialize the animation json. GeckoLib animation json can contain multiple animations.
-                for (var animation : AnimationSerializing.deserializeAnimation(input)) {
+        for (var resource: manager.listResources("player_animation", ignore -> true).entrySet()) {
+            var extension = AnimationCodecRegistry.getExtension(resource.getKey().getPath());
+            if (extension == null) continue;
 
-                    //Save the animation for later use.
-                    animations.put(ResourceLocation.fromNamespaceAndPath(resource.getKey().getNamespace(), PlayerAnimationRegistry.serializeTextToString((String) animation.extraData.get("name")).toLowerCase(Locale.ROOT)), animation);
+            for (AnimationCodec<?> deserializer: AnimationCodecRegistry.INSTANCE.getCodec(extension)) {
+                try (var reader = resource.getValue().open()) {
+                    final var result = deserializer.decode(new BufferedInputStream(reader));
+                    if (result.isEmpty()) throw new RuntimeException("Decoder is not obeying API");
+
+                    animations.putAll(result);
+                    break;
+
+                } catch (IOException e) {
+                    // this is normal to happen
+                    logger.info(String.format("Failed to apply %s on file %s", deserializer.getFormatName(), resource.getKey()), e);
+                } catch (Exception e) {
+                    logger.error(String.format("Unknown error when trying to apply %s on file %s", deserializer.getFormatName(), resource.getKey()), e);
                 }
-            } catch(IOException e) {
-                logger.error("Error while loading payer animation: " + resource.getKey());
-                logger.error(e.getMessage());
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                e.printStackTrace(pw);
-                String sStackTrace = sw.toString(); // stack trace as a string
-                logger.error(sStackTrace);
             }
         }
     }

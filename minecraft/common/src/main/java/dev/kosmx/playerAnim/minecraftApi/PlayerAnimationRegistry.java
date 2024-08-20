@@ -1,5 +1,6 @@
 package dev.kosmx.playerAnim.minecraftApi;
 
+import dev.kosmx.playerAnim.api.IPlayable;
 import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
 import dev.kosmx.playerAnim.core.data.gson.AnimationSerializing;
 import net.fabricmc.api.EnvType;
@@ -37,11 +38,20 @@ import java.util.Optional;
  * Use {@link PlayerAnimationRegistry#getAnimation(ResourceLocation)} to fetch an animation
  * <br><br>
  * Extra animations can be added by ResourcePack(s) or other mods
+ * <br><br>
+ * Breaking change with 2.0.0: Registry now returns an IPlayable type instead of a KeyframeAnimation.
+ * Feel free to safely cast it into KeyframeAnimation:
+ * <br>
+ * <code>if (PlayerAnimationRegistry.getAnimation(id) instanceof KeyframeAnimation animation) {...}</code>
+ * <br>
+ * Or to simply play the result, do<br>
+ * <code>PlayerAnimationRegistry.getAnimation(id).playAnimation()</code> <br>
+ * This change will allow more animation formats to be supported. (Don't forget, you can still wrap the unknown animation in custom wrappers :D)
  */
 @Environment(EnvType.CLIENT)
 public final class PlayerAnimationRegistry {
 
-    private static final HashMap<ResourceLocation, KeyframeAnimation> animations = new HashMap<>();
+    private static final HashMap<ResourceLocation, IPlayable> animations = new HashMap<>();
 
     /**
      * Get an animation from the registry, using Identifier(MODID, animation_name) as key
@@ -49,7 +59,7 @@ public final class PlayerAnimationRegistry {
      * @return animation, <code>null</code> if no animation
      */
     @Nullable
-    public static KeyframeAnimation getAnimation(@NotNull ResourceLocation identifier) {
+    public static IPlayable getAnimation(@NotNull ResourceLocation identifier) {
         return animations.get(identifier);
     }
 
@@ -59,14 +69,14 @@ public final class PlayerAnimationRegistry {
      * @return Optional animation
      */
     @NotNull
-    public static Optional<KeyframeAnimation> getAnimationOptional(@NotNull ResourceLocation identifier) {
+    public static Optional<IPlayable> getAnimationOptional(@NotNull ResourceLocation identifier) {
         return Optional.ofNullable(getAnimation(identifier));
     }
 
     /**
      * @return an unmodifiable map of all the animations
      */
-    public static Map<ResourceLocation, KeyframeAnimation> getAnimations() {
+    public static Map<ResourceLocation, IPlayable> getAnimations() {
         return Map.copyOf(animations);
     }
 
@@ -75,9 +85,9 @@ public final class PlayerAnimationRegistry {
      * @param modid namespace (assets/modid)
      * @return map of path and animations
      */
-    public static Map<String, KeyframeAnimation> getModAnimations(String modid) {
-        HashMap<String, KeyframeAnimation> map = new HashMap<>();
-        for (Map.Entry<ResourceLocation, KeyframeAnimation> entry: animations.entrySet()) {
+    public static Map<String, IPlayable> getModAnimations(String modid) {
+        HashMap<String, IPlayable> map = new HashMap<>();
+        for (Map.Entry<ResourceLocation, IPlayable> entry: animations.entrySet()) {
             if (entry.getKey().getNamespace().equals(modid)) {
                 map.put(entry.getKey().getPath(), entry.getValue());
             }

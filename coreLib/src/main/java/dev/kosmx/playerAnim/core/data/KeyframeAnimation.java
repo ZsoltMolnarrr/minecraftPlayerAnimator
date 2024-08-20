@@ -1,6 +1,8 @@
 package dev.kosmx.playerAnim.core.data;
 
 
+import dev.kosmx.playerAnim.api.IPlayable;
+import dev.kosmx.playerAnim.api.layered.IAnimation;
 import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
 import dev.kosmx.playerAnim.core.data.opennbs.NBS;
 import dev.kosmx.playerAnim.core.util.Ease;
@@ -29,7 +31,7 @@ import java.util.function.Supplier;
  */
 @Immutable
 @SuppressWarnings({"unused", "UnusedReturnValue"})
-public final class KeyframeAnimation implements Supplier<UUID> {
+public final class KeyframeAnimation implements IPlayable, Supplier<UUID> {
     //Time, while the player can move to the beginning pose
 
     public static final StateCollection.State EMPTY_STATE = new StateCollection.State("empty", 0, 0, false);
@@ -201,6 +203,11 @@ public final class KeyframeAnimation implements Supplier<UUID> {
 
     public Optional<StateCollection> getPartOptional(String id) {
         return Optional.ofNullable(getPart(id));
+    }
+
+    @Override
+    public IAnimation playAnimation() {
+        return new KeyframeAnimationPlayer(this);
     }
 
 

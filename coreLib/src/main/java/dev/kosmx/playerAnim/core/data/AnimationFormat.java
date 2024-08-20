@@ -3,6 +3,7 @@ package dev.kosmx.playerAnim.core.data;
 /**
  * Where is the emote from
  */
+@Deprecated
 public enum AnimationFormat {
     JSON_EMOTECRAFT("json"),
     JSON_MC_ANIM("json"),

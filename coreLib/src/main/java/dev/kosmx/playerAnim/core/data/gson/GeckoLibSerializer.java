@@ -1,17 +1,17 @@
 package dev.kosmx.playerAnim.core.data.gson;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import dev.kosmx.playerAnim.api.TransformType;
 import dev.kosmx.playerAnim.core.data.AnimationFormat;
 import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
 import dev.kosmx.playerAnim.core.util.Ease;
 import dev.kosmx.playerAnim.core.util.Easing;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +20,39 @@ import java.util.Map;
  * Serialize movements as emotes from GeckoLib format
  * <a href="https://geckolib.com/">...</a>
  */
-public class GeckoLibSerializer {
-    public static List<KeyframeAnimation> serialize(JsonObject node){
+public class GeckoLibSerializer implements JsonDeserializer<List<KeyframeAnimation>> {
+
+
+    @ApiStatus.Internal
+    public static final Gson GSON;
+
+    /**
+     * TypeToken helper for serializing
+     *
+     * @return TypeToken for animation deserialization
+     */
+    @Deprecated
+    @ApiStatus.Internal
+    public static Type getListedTypeToken() {
+        return new TypeToken<List<KeyframeAnimation>>() {}.getType();
+    }
+
+    static {
+        GsonBuilder builder = new GsonBuilder();
+        builder.setPrettyPrinting();
+        GeckoLibSerializer gJson = new GeckoLibSerializer();
+        builder.registerTypeAdapter(GeckoLibSerializer.getListedTypeToken(), gJson);
+        builder.registerTypeAdapter(KeyframeAnimation.class, gJson);
+        GSON = builder.create();
+    }
+
+
+    @Override
+    public List<KeyframeAnimation> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        return deserialize(json.getAsJsonObject());
+    }
+
+    public static List<KeyframeAnimation> deserialize(JsonObject node){
         try {
             return readAnimations(node.get("animations").getAsJsonObject());
         } catch(NumberFormatException e) {

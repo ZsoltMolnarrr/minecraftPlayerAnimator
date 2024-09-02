@@ -15,21 +15,20 @@ import java.util.List;
  * <p>
  * Use {@link AnimationSerializing#deserializeAnimation(Reader)} to deserialize<br>
  * or {@link AnimationSerializing#serializeAnimation(KeyframeAnimation)} to serialize.
+ * @deprecated use {@link AnimationCodec instead}
  */
+@Deprecated(forRemoval = true)
 public class AnimationSerializing {
 
-    /**
-     * Static initialized serializer instance for Emotecraft and GeckoLib animation json
-     */
-    public static final Gson SERIALIZER;
 
     /**
      * Deserialize animations from Emotecraft or GeckoLib InputStreamReader
      * @param stream inputStreamReader
      * @return List of animations
      */
+    @Deprecated(forRemoval = true)
     public static List<KeyframeAnimation> deserializeAnimation(Reader stream) {
-        return SERIALIZER.fromJson(stream, AnimationJson.getListedTypeToken());
+        return AnimationJson.GSON.fromJson(stream, AnimationJson.getListedTypeToken());
     }
 
     /**
@@ -37,6 +36,7 @@ public class AnimationSerializing {
      * @param stream inputStream
      * @return List of animations
      */
+    @Deprecated(forRemoval = true)
     public static List<KeyframeAnimation> deserializeAnimation(InputStream stream) throws IOException {
         try (InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
             return deserializeAnimation(reader);
@@ -51,7 +51,7 @@ public class AnimationSerializing {
      * @return string
      */
     public static String serializeAnimation(KeyframeAnimation animation) {
-         return SERIALIZER.toJson(animation, KeyframeAnimation.class);
+         return AnimationJson.GSON.toJson(animation, KeyframeAnimation.class);
     }
 
     /**
@@ -64,14 +64,5 @@ public class AnimationSerializing {
     public static Writer writeAnimation(KeyframeAnimation animation, Writer writer) throws IOException {
         writer.write(serializeAnimation(animation));
         return writer;
-    }
-
-    static {
-        GsonBuilder builder = new GsonBuilder();
-        builder.setPrettyPrinting();
-        AnimationJson animationJson = new AnimationJson();
-        builder.registerTypeAdapter(AnimationJson.getListedTypeToken(), animationJson);
-        builder.registerTypeAdapter(KeyframeAnimation.class, animationJson);
-        SERIALIZER = builder.create();
     }
 }

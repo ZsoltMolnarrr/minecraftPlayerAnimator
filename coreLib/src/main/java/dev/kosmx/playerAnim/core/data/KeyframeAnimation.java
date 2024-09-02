@@ -8,6 +8,7 @@ import dev.kosmx.playerAnim.core.data.opennbs.NBS;
 import dev.kosmx.playerAnim.core.util.Ease;
 import lombok.Getter;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import javax.annotation.concurrent.Immutable;
 import java.nio.ByteBuffer;
@@ -203,8 +204,13 @@ public final class KeyframeAnimation implements IPlayable {
     }
 
     @Override
-    public IActualAnimation<KeyframeAnimationPlayer> playAnimation() {
+    public @NotNull IActualAnimation<KeyframeAnimationPlayer> playAnimation() {
         return new KeyframeAnimationPlayer(this);
+    }
+
+    @Override
+    public @NotNull String getName() {
+        return ((String)extraData.get("name")).toLowerCase(Locale.ROOT);
     }
 
 

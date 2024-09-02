@@ -5,7 +5,9 @@ import com.google.gson.reflect.TypeToken;
 import dev.kosmx.playerAnim.core.data.AnimationFormat;
 import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
 import dev.kosmx.playerAnim.core.util.Easing;
+import org.jetbrains.annotations.ApiStatus;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +20,27 @@ public class AnimationJson implements JsonDeserializer<List<KeyframeAnimation>>,
 
     private final static int modVersion = 3;
 
+    @ApiStatus.Internal
+    public static final Gson GSON;
+
     /**
      * TypeToken helper for serializing
      *
      * @return TypeToken for animation deserialization
      */
+    @Deprecated
+    @ApiStatus.Internal
     public static Type getListedTypeToken() {
         return new TypeToken<List<KeyframeAnimation>>() {}.getType();
+    }
+
+    static {
+        GsonBuilder builder = new GsonBuilder();
+        builder.setPrettyPrinting();
+        AnimationJson animationJson = new AnimationJson();
+        builder.registerTypeAdapter(AnimationJson.getListedTypeToken(), animationJson);
+        builder.registerTypeAdapter(KeyframeAnimation.class, animationJson);
+        GSON = builder.create();
     }
 
     /**
@@ -35,7 +51,7 @@ public class AnimationJson implements JsonDeserializer<List<KeyframeAnimation>>,
         JsonObject node = json.getAsJsonObject();
 
         if(!node.has("emote")){
-            return GeckoLibSerializer.serialize(node);
+            throw new JsonParseException("not an emotecraft animation");
         }
 
         int version = 1;

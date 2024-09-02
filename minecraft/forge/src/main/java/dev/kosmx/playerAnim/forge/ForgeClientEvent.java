@@ -34,6 +34,6 @@ public class ForgeClientEvent {
     }
 
     public void resourceLoadingListener(@NotNull RegisterClientReloadListenersEvent event) {
-        event.registerReloadListener((ResourceManagerReloadListener) manager -> PlayerAnimationRegistry.resourceLoaderCallback(manager, LOGGER));
+        event.registerReloadListener((ResourceManagerReloadListener) PlayerAnimationRegistry::resourceLoaderCallback);
     }
 }

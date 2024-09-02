@@ -1,12 +1,11 @@
 package dev.kosmx.playerAnim.minecraftApi.codec;
 
 import dev.kosmx.playerAnim.api.IPlayable;
-import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
+import java.util.Collection;
 
 @FunctionalInterface
 public interface AnimationDecoder<T extends IPlayable> {
@@ -22,5 +21,5 @@ public interface AnimationDecoder<T extends IPlayable> {
      * @throws IOException If the format can't be parsed.
      */
     @NotNull
-    Map<ResourceLocation, T> decode(@NotNull InputStream buffer) throws IOException;
+    Collection<T> decode(@NotNull InputStream buffer) throws IOException;
 }

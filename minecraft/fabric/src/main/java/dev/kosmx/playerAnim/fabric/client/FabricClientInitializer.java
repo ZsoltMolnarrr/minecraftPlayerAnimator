@@ -38,7 +38,7 @@ public class FabricClientInitializer implements ClientModInitializer {
 
             @Override
             public void onResourceManagerReload(@NotNull ResourceManager manager) {
-                PlayerAnimationRegistry.resourceLoaderCallback(manager, LOGGER);
+                PlayerAnimationRegistry.resourceLoaderCallback(manager);
             }
         });
     }

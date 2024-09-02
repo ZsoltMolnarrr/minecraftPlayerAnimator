@@ -1,8 +1,7 @@
 package dev.kosmx.playerAnim.minecraftApi;
 
 import dev.kosmx.playerAnim.api.IPlayable;
-import dev.kosmx.playerAnim.minecraftApi.codec.AnimationCodec;
-import dev.kosmx.playerAnim.minecraftApi.codec.AnimationCodecRegistry;
+import dev.kosmx.playerAnim.minecraftApi.codec.AnimationCodecs;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.RegistryAccess;
@@ -15,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -85,7 +83,8 @@ public final class PlayerAnimationRegistry {
      * @param modid namespace (assets/modid)
      * @return map of path and animations
      */
-    public static Map<String, IPlayable> getModAnimations(String modid) {
+    @NotNull
+    public static Map<String, IPlayable> getModAnimations(@NotNull String modid) {
         HashMap<String, IPlayable> map = new HashMap<>();
         for (Map.Entry<ResourceLocation, IPlayable> entry: animations.entrySet()) {
             if (entry.getKey().getNamespace().equals(modid)) {
@@ -100,27 +99,21 @@ public final class PlayerAnimationRegistry {
      * Internal use only!
      */
     @ApiStatus.Internal
-    public static void resourceLoaderCallback(@NotNull ResourceManager manager, Logger logger) {
+    public static void resourceLoaderCallback(@NotNull ResourceManager manager) {
         animations.clear();
 
-        for (var resource: manager.listResources("player_animation", ignore -> true).entrySet()) {
-            var extension = AnimationCodecRegistry.getExtension(resource.getKey().getPath());
+        for (var resource: manager.listResources("player_animations", ignore -> true).entrySet()) {
+            var extension = AnimationCodecs.getExtension(resource.getKey().getPath());
             if (extension == null) continue;
-
-            for (AnimationCodec<?> deserializer: AnimationCodecRegistry.INSTANCE.getCodec(extension)) {
-                try (var reader = resource.getValue().open()) {
-                    final var result = deserializer.decode(new BufferedInputStream(reader));
-                    if (result.isEmpty()) throw new RuntimeException("Decoder is not obeying API");
-
-                    animations.putAll(result);
-                    break;
-
+            var a = AnimationCodecs.deserialize(extension, () -> {
+                try {
+                    return resource.getValue().open();
                 } catch (IOException e) {
-                    // this is normal to happen
-                    logger.info(String.format("Failed to apply %s on file %s", deserializer.getFormatName(), resource.getKey()), e);
-                } catch (Exception e) {
-                    logger.error(String.format("Unknown error when trying to apply %s on file %s", deserializer.getFormatName(), resource.getKey()), e);
+                    throw new RuntimeException(e);
                 }
+            });
+            for(var animation: a) {
+                animations.put(ResourceLocation.fromNamespaceAndPath(resource.getKey().getNamespace(), animation.getName()), animation);
             }
         }
     }

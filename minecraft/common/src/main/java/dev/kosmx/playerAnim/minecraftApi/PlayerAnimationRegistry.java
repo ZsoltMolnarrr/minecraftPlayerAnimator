@@ -103,7 +103,7 @@ public final class PlayerAnimationRegistry {
     public static void resourceLoaderCallback(@NotNull ResourceManager manager, Logger logger) {
         animations.clear();
 
-        for (var resource: manager.listResources("player_animation", ignore -> true).entrySet()) {
+        for (var resource: manager.listResources("player_animations", ignore -> true).entrySet()) {
             var extension = AnimationCodecRegistry.getExtension(resource.getKey().getPath());
             if (extension == null) continue;
 
